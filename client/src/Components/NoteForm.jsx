@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
   Box,
   TextField,
@@ -14,6 +14,7 @@ import {
   FormControlLabel,
   FormHelperText,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -22,11 +23,13 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import EmojiPicker from "emoji-picker-react";
 import { expirationOptions, textinfo } from "../constants";
 import axios from "axios";
+
 const NoteForm = () => {
   const [toggleinfo, settoggleinfo] = useState(false);
   const [toggleform, settoggleform] = useState(false);
   const [toggleaddfunc, settoggleaddfunc] = useState(false);
   const [toggleemojipicker, settoggleemojipicker] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
   const formikRef = useRef();
@@ -36,7 +39,6 @@ const NoteForm = () => {
   const handletoggleadd = () => settoggleaddfunc((prev) => !prev);
   const handletoggleEmopicker = () => settoggleemojipicker((prev) => !prev);
 
- 
   const Yupschema = Yup.object({
     content: Yup.string().required("Note content is required"),
     notificationEmail: Yup.string().email("Invalid email"),
@@ -78,6 +80,7 @@ const NoteForm = () => {
       }}
       validationSchema={Yupschema}
       onSubmit={async (values, { setSubmitting }) => {
+        setLoading(true);
         const payload = {
           content: values.content,
           destroyAfter: values.destroyAfter,
@@ -88,27 +91,19 @@ const NoteForm = () => {
         };
 
         try {
-          // ✅ 1. Send the email if notificationEmail is present
           if (values.notificationEmail) {
-            const emailRes = await axios.post(
+            await axios.post(
               "http://localhost:3000/api/notes/send-destruction-info",
               {
                 email: values.notificationEmail,
                 destroyAfter: values.destroyAfter,
               }
             );
-            console.log("Email response:", emailRes.data);
-            alert(emailRes.data.message); // optional
           }
 
-          // ✅ 2. Create the note
-          const res = await axios.post(
-            "http://localhost:3000/api/notes",
-            payload
-          );
+          const res = await axios.post("http://localhost:3000/api/notes", payload);
 
           const gen_link = `http://localhost:5173/${res.data.noteId}`;
-          console.log(gen_link);
           navigate("/viewnoteslink", {
             state: { link: gen_link, destroyAfter: values.destroyAfter },
           });
@@ -116,6 +111,7 @@ const NoteForm = () => {
           console.error("Failed to create note or send email:", error);
           alert("Something went wrong. Check console for details.");
         } finally {
+          setLoading(false);
           setSubmitting(false);
         }
       }}
@@ -320,7 +316,6 @@ const NoteForm = () => {
                         color: "black",
                         fontSize: "1.2rem",
                         minWidth: 44,
-
                         height: 44,
                         boxShadow: 2,
                         transition: "all 0.2s ease",
@@ -533,10 +528,10 @@ const NoteForm = () => {
                   gap: 2,
                 }}
               >
-                <Button
+                <LoadingButton
+                  loading={loading}
                   variant="contained"
                   type="submit"
-                
                   sx={{
                     backgroundColor: "#43464bff",
                     color: "#fff",
@@ -555,7 +550,7 @@ const NoteForm = () => {
                   }}
                 >
                   Create Note
-                </Button>
+                </LoadingButton>
 
                 <Button
                   variant="outlined"

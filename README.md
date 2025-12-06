@@ -7,13 +7,13 @@ It allows users to create encrypted or self‑destructing notes, optionally prot
 
 ## Screenshots
 ### Homepage / Create Note
-![Create Note Page](screenshots/securenote1.png)
+![Create Note Page](./screenshots/securenote1.PNG)
 
 ### Note Created / Link Generated
-![Note Link Page](screenshots/securenote2.png)
+![Note Link Page](./screenshots/securenote2.PNG)
 
 ### Example Note View
-![Example Note](screenshots/securenote3.png)
+![Example Note](./screenshots/securenote3.JPG)
 
 
 ## 🚀 Features
@@ -75,7 +75,7 @@ npm run dev
 
 ---
 
-## Usage
+### Usage
 Open the app in your browser
 Fill in note content (plus emojis if desired)
 Optionally configure: destroy-after option, password, notification email, link title
